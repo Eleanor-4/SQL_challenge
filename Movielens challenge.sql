@@ -1,13 +1,13 @@
 Use Movielens;
 
 -- 1 List the titles and release dates of movies released between 1983-1993 in reverse chronological order.
-select title, release_date
+select title as "movie title", release_date
 from movies
 WHERE release_date between "1983-01-01" and "1993-01-12"
 order by release_date desc;
 
 -- 2 Without using LIMIT, list the titles of the movies with the lowest average rating.
-SELECT title, AVG(rating) AS average_rating
+SELECT title as "movie title", AVG(rating) AS average_rating
 FROM movies
 JOIN ratings ON movies.id = ratings.movie_id
 GROUP BY movies.title
@@ -22,17 +22,19 @@ HAVING average_rating = (
 );
 
 -- 3 List the unique records for Sci-Fi movies where male 24-year-old students have given 5-star ratings.
-SELECT users.id, genres.name, users.age, users.gender, ratings.rating, movies.id
-FROM genres_movies
-JOIN movies ON genres_movies.movie_id = movies.id
-JOIN genres ON genres_movies.genre_id = genres.id
-JOIN ratings ON movies.id = ratings.movie_id
-JOIN users ON ratings.user_id = users.id
-WHERE ratings.rating = 5 AND users.gender = 'M' AND genres.name = 'Sci-Fi' AND users.age = 24;
+SELECT u.id as "user id", g.name, u.age, u.gender, r.rating, o.name, m.title as "movie title"
+FROM genres_movies gm
+JOIN movies m ON gm.movie_id = m.id
+JOIN genres g ON gm.genre_id = g.id
+JOIN ratings r ON m.id = r.movie_id
+JOIN users  u ON r.user_id = u.id
+join occupations o on o.id = u.occupation_id
+WHERE r.rating = 5 AND u.gender = 'M' AND g.name = 'Sci-Fi' AND u.age = 24 AND o.name = "student"
+order by u.id;
 
 -- 4 List the unique titles of each of the movies released on the most popular release day. 
-SELECT title, release_date 
-from movies
+SELECT title as "movie title", release_date 
+from movies 
 WHERE release_date = (
 	SELECT release_date 
 	FROM movies

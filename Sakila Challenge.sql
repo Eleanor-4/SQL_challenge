@@ -1,53 +1,53 @@
 USE sakila;
 
 -- 1 List all actors.
-select * from actor;
+select Actor_id, First_name, last_name from actor;
 
 -- 2 Find the surname of the actor with the forename 'John'.
 select last_name from actor where first_name ="john";
 
 -- 3 Find all actors with surname 'Neeson'.
-select * from actor where last_name = "Neeson";
+select First_name, last_name from actor where last_name = "Neeson";
 
 -- 4 Find all actors with ID numbers divisible by 10.
 Select first_name, Last_name, (actor_ID/10)
 from actor WHERE actor_id % 10 = 0;
 
 -- 5 What is the description of the movie with an ID of 100?
-select description from film where film_id = 100;
+select description, film_id from film where film_id = 100;
 
 -- 6 Find every R-rated movie.
-select title, rating from film where rating = "R";
+select title as "Movie title", rating as "Age rating" from film where rating = "R";
 
 -- 7 Find every non-R-rated movie.
-select title, rating from film where rating != "R";
+select title as "movie title", rating as "age rating" from film where rating != "R";
 
 -- 8 Find the ten shortest movies.
-select title, description, length from film where length order by length limit 10;
+select title as "movie title", description, length from film where length order by length limit 10;
 
 -- 9 Find the movies with the longest runtime, without using LIMIT.
-Select title from film 
+Select title as "movie title", length from film 
 where length = (SELECT Max(length) FROM film);
 
 -- 10 Find all movies that have deleted scenes.
-select title from film 
+select title as "movies with deleted scenes" from film 
 where special_features like "%deleted scenes%";
 
 
 -- 11 Using HAVING, reverse-alphabetically list the last names that are not repeated.
-SELECT last_name from actor
+SELECT last_name as "unique last names" from actor
 GROUP BY last_name
 HAVING COUNT(last_name)=1
 ORDER BY last_name DESC;
 
 -- 12 Using HAVING, list the last names that appear more than once, from highest to lowest frequency.
-SELECT last_name, count(last_name) from actor
+SELECT last_name, count(last_name) as "Frequency of last name" from actor
 GROUP BY last_name
 HAVING COUNT(last_name)>1
 ORDER BY count(last_name) desc;
 
 -- 13 Which actor has appeared in the most films?
-select first_name, last_name, count(fa.film_id)
+select first_name, last_name, count(fa.film_id) as "number of films appeared in"
 From Actor a
 JOIN film_actor fa ON fa.actor_id = a.actor_id
 GROUP BY a.actor_id
@@ -55,9 +55,11 @@ Order by count(fa.film_id) desc
 limit 1;
 
 -- 14 When is 'Academy Dinosaur' due?
-select title, release_year from film where title = "academy Dinosaur";
+select title as "movie title", release_year from film where title = "academy Dinosaur";
+
 -- i have given 2 answers as the question is ambiguous - is the due date the release year or when it is due to be returned to the shop
-SELECT return_date
+
+SELECT return_date as "return dates for academy dinosur"
 FROM rental r
 JOIN inventory i ON i.inventory_id = r.inventory_id
 JOIN  film f ON f.film_id = i.film_id
@@ -68,7 +70,7 @@ ORDER BY return_date DESC;
 select avg(length) from film;
 
 -- 16 List the average runtime for every film category.
-select c.name, avg(length)
+select c.name as "Genre", avg(length)
 from film f
 JOIN film_category fc ON f.film_id=fc.film_id
 JOIN category c ON c.category_id=fc.category_id
@@ -76,24 +78,24 @@ GROUP by fc.category_id;
 
 
 -- 17 List all movies featuring a robot.
-select title
+select title as "Films featuring a robot"
 from film
 where description like "%robot%";
 
 -- 18 How many movies were released in 2010?
-select count(film_id) 
+select count(film_id) as "number of films realeased in 2010"
 from film
 where release_year = 2010;
 
 -- 19 Find the titles of all the horror movies.
-select f.title, c.name 
+select f.title as "titles of horror movies", c.name 
 from film f
 JOIN film_category fc ON f.film_id=fc.film_id
 JOIN category c ON c.category_id=fc.category_id
 WHERE c.name = "horror";
 
 -- 20 List the full name of the staff member with the ID of 2.
-select first_name, last_name
+select first_name, last_name, staff_id
 from staff Where staff_ID = 2;
 
 -- 21 List all the movies that Fred Costner has appeared in.
@@ -105,10 +107,10 @@ WHERE a.first_name = "Fred" AND a.last_name = "Costner";
 
 
 -- 22 How many distinct countries are there?
-select count(distinct country) from country;
+select count(distinct country) as "number of distinct countries" from country;
 
 -- 23 List the name of every language in reverse-alphabetical order.
-select name 
+select name as "Languages"
 from language 
 order by name desc;
 
@@ -118,8 +120,10 @@ from actor
 where last_name like "%son";
 
 -- 25 Which category contains the most films?
-select c.name, count(f.title)
+select c.name as "Category", count(f.title)
 from category c
 join film_category fc ON c.category_id = fc.category_id
 join film f ON f.film_id=fc.film_id
-group by c.name;
+group by c.name
+order by count(f.title) desc
+Limit 1;
